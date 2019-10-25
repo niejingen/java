@@ -1,0 +1,112 @@
+java发布并调用webservice接口简单示例
+如何发布一个webservice:
+
+1. 创建一个web项目
+
+
+ 其中主要包括webservice接口，实现类，发布类
+
+《接口》
+
+package com.yonyou.webservice;
+
+import javax.jws.WebMethod;
+
+@javax.jws.WebService
+public interface WebService {
+
+@WebMethod
+String sayhello(String name); 
+}
+
+这是WebService接口，其中定义了一个sayHello(String name)的方法
+
+记住一定要在类上加上@WebService注解
+
+@WebMethod注解声明了这个方法是要发布出去的方法
+
+ 
+
+《接口实现类》
+
+package com.yonyou.webservice;
+
+@javax.jws.WebService
+public class WebServiceImpl implements WebService {
+
+@Override
+public String sayhello(String name) {
+System.out.println("WebService begin...... "+name);
+return name;
+}
+
+}
+
+《发布类》直接执行main方法，注意需要调用接口时此main方法要启动
+
+package com.yonyou.webservice;
+
+import javax.xml.ws.Endpoint;
+
+public class WebServicePublish {
+
+public static void main(String[] args) {
+//访问地址 http://localhost:8080/WS_Server/Webservice?wsdl
+String address = "http://localhost:8080/WS_Server/Webservice";
+Endpoint.publish(address, new WebServiceImpl());
+System.out.println("Webservice已发布");
+}
+}
+
+ 
+
+浏览器访问http://localhost:8080/WS_Server/Webservice?wsdl地址显示如下，webservice接口发布成功
+
+
+
+ 
+
+ 如何调用发布成功的webservice:
+
+（1）可以使用soapUI工具调用测试
+ 
+
+ （2）客户端调用
+
+创建一个客户端项目
+
+Win+R组合键进入命令行
+
+在cmd中输入wsimport -s 我们这个项目的src路径 -keep 我们发布的webservice地址 例如：
+
+wsimport -s F:\GX\workspace\webserviceClient\src -keep http://localhost:8080/WS_Server/Webservice?wsdl
+
+
+
+ 
+
+ 编译完成会在客户端项目中生成许多类
+
+
+
+ 
+
+ 自己写的一个客户端的测试类WsClient
+
+package com.yonyou.webservice;
+
+public class WsClient {
+
+public static void main(String[] args) {
+WebServiceImplService factory = new WebServiceImplService();
+WebServiceImpl wsimpl = factory.getWebServiceImplPort();
+String result = wsimpl.sayhello("Webservice调用成功");
+System.out.println("测试webservice结果为: "+result);
+}
+}
+
+执行测试类，看是否调用webservice接口成功
+
+
+
+ 
