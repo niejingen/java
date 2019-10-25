@@ -1,0 +1,116 @@
+
+项目结构：
+
+
+JsonServlet接口:
+
+package com.demo;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class JsonServlet extends HttpServlet{
+private static final long serialVersionUID = 1L;
+@Override
+protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+String page = req.getParameter("page");
+// 将数据添加到数组
+List<String> newslist = new ArrayList<String>();
+if (page == null || page.equals("0")) {
+newslist.add("1");
+newslist.add("2");
+newslist.add("3");
+newslist.add("4");
+newslist.add("5");
+newslist.add("6");
+}else {
+newslist.add("01");
+newslist.add("001");
+newslist.add("0001");
+newslist.add("00001");
+newslist.add("000001");
+newslist.add("00000001");
+}
+// 调用json.jar工具封装json
+JSONObject object = new JSONObject();
+for(String str : newslist){
+try {
+object.put(str, str+":"+page);
+}catch (JSONException e) {
+e.printStackTrace();
+}
+}
+String json = object.toString();
+// 输出到界面
+System.out.println(json);
+resp.setContentType("text/plain");
+resp.setCharacterEncoding("gb2312");
+PrintWriter out = new PrintWriter(resp.getOutputStream());
+out.print(json);
+out.flush();
+// 更多Json转换使用请看JsonTest类
+
+}
+@Override
+protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+this.doGet(req, resp);
+}
+}
+
+index.jsp：
+
+<%@ page language="java" contentType="text/html; charset=utf-8"
+pageEncoding="utf-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<form action="getJson" method="get">
+<input type="submit" value="点击获取JSON数据"/>
+</form>
+</body>
+</html>
+
+
+web.xml:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+<display-name>JsonTest</display-name>
+<welcome-file-list>
+<welcome-file>index.jsp</welcome-file>
+</welcome-file-list>
+
+<servlet>
+<servlet-name>JsonServlet</servlet-name>
+<servlet-class>com.demo.JsonServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+<servlet-name>JsonServlet</servlet-name>
+<url-pattern>/getJson</url-pattern>
+</servlet-mapping>
+</web-app>
+
+
+tomcat中启动访问
+
+
+
+ 
+
+ 
+
+ 
