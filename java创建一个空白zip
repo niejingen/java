@@ -1,0 +1,20 @@
+String zipath = localpath+zipname+".zip";
+
+public static void createNewzip(String zipath) throws Exception {
+ZipOutputStream zoutput = null;
+try {
+File file = new File(zipath);
+if(!file.exists())
+file.createNewFile();
+FileOutputStream fOutputStream = new FileOutputStream(file);
+zoutput = new ZipOutputStream(fOutputStream);
+
+} catch (Exception e) {
+e.printStackTrace();
+}finally{
+zoutput.closeEntry();
+zoutput.close();
+}
+}
+
+在localpath下面生成一个名为zipname的zip
