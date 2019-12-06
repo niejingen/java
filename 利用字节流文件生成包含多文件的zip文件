@@ -1,0 +1,84 @@
+InputStream[] inputStreamsList = new InputStream[jsonArr.size()];
+String[] fileNameList = new String[jsonArr.size()];
+
+这里是前台获取的文件信息，到fastdfs中查询出相应文件流
+
+for(int i=0;i<jsonArr.size();i++) {
+JSONObject jsonObj = (JSONObject) jsonArr.get(i);
+
+String fileName = jsonObj.getString("filename");
+String fastdir = jsonObj.getString("fastdir");
+String conf_filename = this.getClass().getResource("/db.properties").getPath();
+ClientGlobal.init(conf_filename);
+TrackerClient tracker = null;
+tracker = new TrackerClient();
+TrackerServer trackerServer = null;
+trackerServer = tracker.getConnection();
+StorageServer storageServer = null;
+StorageClient storageClient = null;
+storageClient = new StorageClient(trackerServer, storageServer);
+byte[] b = storageClient.download_file("group1", fastdir);
+
+
+InputStream inputStream = new ByteArrayInputStream(b);
+inputStreamsList[i] =inputStream;
+fileNameList[i]= fileName;
+
+}
+
+ 
+
+//调用zip打包方法
+public static void zip(String[] fileNameList, InputStream[] inputStream,String zipath) throws Exception {
+if (fileNameList==null||fileNameList.length==0) {
+throw new IllegalArgumentException("fileNameList is empty !");
+}
+if (fileNameList.length != inputStream.length) {
+throw new IllegalArgumentException("fileNameList length is not equals to inputStream length !");
+}
+if(inputStream==null||inputStream.length==0) {
+throw new IllegalArgumentException("inputStream is empty !");
+}
+
+ZipOutputStream zipOut = null;
+try {
+
+//创建一个空白zip
+createNewzip(zipath);
+
+File dir = new File(zipath);
+OutputStream out = new FileOutputStream(dir);
+zipOut = new ZipOutputStream(out);
+for (int i = 0; i < fileNameList.length; i++) {
+if (null == inputStream[i]) {
+return;
+}
+try {
+zipOut.putNextEntry(new ZipEntry(fileNameList[i]));
+byte[] b = new byte[1024];
+int len = 0;
+while((len = inputStream[i].read(b)) != -1) {
+zipOut.write(b,0,len);
+}
+zipOut.flush();
+} catch (Exception e) {
+e.printStackTrace();
+}finally{
+if(inputStream[i] != null) {
+inputStream[i].close();
+}
+}
+}
+} finally {
+try {
+zipOut.close();
+} catch (IOException e) {
+e.printStackTrace();
+}
+}
+}
+
+
+//创建一个空白zip参考
+
+https://www.cnblogs.com/nje19951205/p/11991395.html
