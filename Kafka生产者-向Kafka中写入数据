@@ -1,0 +1,22 @@
+public class KafkaProducerTest {
+    public static void ProducerTest(String data){
+        Properties props = new Properties();
+        props.put("bootstrap.servers", "192.168.108.137:30019");//指定broker的地址清单
+        props.put("acks", "all");//所有的partition都收到消息，生产者才会收到一个服务器的成功响应
+        props.put("retries", 0);//生产者从服务器收到临时性错误时，生产者重发消息的次数
+        props.put("batch.size", 16384);//发送到同一个partition的消息会被先存储在batch中，该参数指定一个batch可以使用的内存大小
+        props.put("linger.ms", 1);//生产者在发送消息前等待linger.ms，为了等待更多的消息加入到batch中
+        props.put("buffer.memory", 33554432);//设置生产者内缓存区域的大小，生产者用它缓冲要发送到服务器的消息
+        props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");//必须是一个实现org.apache.kafka.common.serialization.Serializer接口的类，将key序列化成字节数组。注意：key.serializer必须被设置，即使消息中没有指定key
+        props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");//value序列化成字节数组
+        Producer<String, String> producer = new KafkaProducer(props);
+        producer.send(new ProducerRecord<>("kj_test", data));//topic:key value
+        producer.close();
+    }
+    public static void main(String[] args) {
+        String data="{\"entitycode\":\"test\""}";
+        ProducerTest(data);
+    }
+
+
+}
